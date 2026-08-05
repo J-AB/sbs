@@ -323,6 +323,11 @@
     max-width:100%; max-height:88vh; border-radius:4px; box-shadow:var(--shadow);
     display:block; margin-inline:auto;
   }
+  .poster-modal-caption{
+    text-align:center; color:var(--ink-soft); font-size:.85rem;
+    letter-spacing:.03em; margin-top:.9rem;
+  }
+  .poster-modal-caption:empty{ display:none; }
   .poster-modal-close{
     position:absolute; top:-2.6rem; right:0; background:none; border:none;
     color:var(--ink); font-size:1.4rem; cursor:pointer; padding:.4rem;
@@ -518,6 +523,7 @@
   <div class="poster-modal-content">
     <button type="button" class="poster-modal-close" id="poster-modal-close" aria-label="Schließen">✕</button>
     <img id="poster-modal-img" src="" alt="Event-Plakat">
+    <p class="poster-modal-caption" id="poster-modal-caption"></p>
   </div>
   <button type="button" class="poster-modal-nav poster-modal-next" id="poster-modal-next" aria-label="Nächstes Bild">›</button>
 </div>
@@ -621,10 +627,20 @@
       if (!grid) return;
       var shown = 0;
 
+      // Dateiname "01_Musikfest Riegel.jpg" -> Bildunterschrift "Musikfest Riegel"
+      // (Ziffern-Präfix dient nur zur Unterscheidung gleicher Namen, wird nicht angezeigt)
+      function captionFor(file){
+        var name = file.replace(/\.[^.]+$/, '');
+        var match = name.match(/^\d+_(.+)$/);
+        return match ? match[1] : name;
+      }
+
       function openLightbox(index){
         var modal = document.getElementById('poster-modal');
         var modalImg = document.getElementById('poster-modal-img');
+        var modalCaption = document.getElementById('poster-modal-caption');
         modalImg.src = 'gallery/' + files[index];
+        modalCaption.textContent = captionFor(files[index]);
         modal.dataset.index = index;
         modal.classList.add('open', 'has-nav');
         modal.setAttribute('aria-hidden', 'false');
@@ -638,9 +654,13 @@
           item.className = 'gallery-item';
           var img = document.createElement('img');
           img.src = 'gallery/' + file;
-          img.alt = '';
+          img.alt = captionFor(file);
           img.loading = 'lazy';
+          var cap = document.createElement('div');
+          cap.className = 'cap';
+          cap.textContent = captionFor(file);
           item.appendChild(img);
+          item.appendChild(cap);
           item.addEventListener('click', function(){ openLightbox(index); });
           grid.appendChild(item);
         });
@@ -666,9 +686,11 @@
       function showGalleryIndex(index){
         var modal = document.getElementById('poster-modal');
         var modalImg = document.getElementById('poster-modal-img');
+        var modalCaption = document.getElementById('poster-modal-caption');
         var wrapped = (index + files.length) % files.length;
         modal.dataset.index = wrapped;
         modalImg.src = 'gallery/' + files[wrapped];
+        modalCaption.textContent = captionFor(files[wrapped]);
       }
       document.getElementById('poster-modal-prev').addEventListener('click', function(){
         var modal = document.getElementById('poster-modal');
@@ -750,6 +772,7 @@
       document.querySelectorAll('.poster-btn').forEach(function(btn){
         btn.addEventListener('click', function(){
           modalImg.src = btn.getAttribute('data-plakat');
+          document.getElementById('poster-modal-caption').textContent = '';
           modal.classList.remove('has-nav');
           modal.classList.add('open');
           modal.setAttribute('aria-hidden', 'false');
