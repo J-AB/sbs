@@ -804,17 +804,26 @@
       var data = new FormData(bookingForm);
       submitBtn.disabled = true;
       submitBtn.textContent = 'Wird gesendet...';
+      status.textContent = '';
+
+      var resetButton = function(){
+        submitBtn.textContent = 'Anfrage senden';
+        submitBtn.disabled = false;
+      };
+      // Notfall-Absicherung: Button bleibt nie länger als 8s auf "Wird gesendet..." hängen
+      var safetyTimeout = setTimeout(resetButton, 8000);
+
       fetch(bookingForm.action, { method:'POST', mode:'no-cors', body:data })
         .then(function(){
-          bookingForm.reset();
           status.textContent = 'Danke! Eure Anfrage wurde übermittelt — wir melden uns.';
-          submitBtn.textContent = 'Anfrage senden';
-          submitBtn.disabled = false;
+          bookingForm.reset();
         })
         .catch(function(){
           status.textContent = 'Da ist leider etwas schiefgelaufen. Versucht es bitte erneut.';
-          submitBtn.textContent = 'Anfrage senden';
-          submitBtn.disabled = false;
+        })
+        .finally(function(){
+          clearTimeout(safetyTimeout);
+          resetButton();
         });
     });
   }
