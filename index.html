@@ -512,7 +512,7 @@
         </label>
       </div>
       <button type="submit" class="btn btn-primary">Anfrage senden</button>
-      
+      <p class="form-note" id="form-status"></p>
     </form>
   </div>
 </section>
@@ -800,11 +800,12 @@
     bookingForm.addEventListener('submit', function(e){
       e.preventDefault();
       var status = document.getElementById('form-status');
+      var setStatus = function(text){ if (status) status.textContent = text; };
       var submitBtn = bookingForm.querySelector('button[type="submit"]');
       var data = new FormData(bookingForm);
       submitBtn.disabled = true;
       submitBtn.textContent = 'Wird gesendet...';
-      status.textContent = '';
+      setStatus('');
 
       var resetButton = function(){
         submitBtn.textContent = 'Anfrage senden';
@@ -815,11 +816,11 @@
 
       fetch(bookingForm.action, { method:'POST', mode:'no-cors', body:data })
         .then(function(){
-          status.textContent = 'Danke! Eure Anfrage wurde übermittelt — wir melden uns.';
+          setStatus('Danke! Eure Anfrage wurde übermittelt — wir melden uns.');
           bookingForm.reset();
         })
         .catch(function(){
-          status.textContent = 'Da ist leider etwas schiefgelaufen. Versucht es bitte erneut.';
+          setStatus('Da ist leider etwas schiefgelaufen. Versucht es bitte erneut.');
         })
         .finally(function(){
           clearTimeout(safetyTimeout);
