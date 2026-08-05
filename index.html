@@ -235,11 +235,17 @@
   @media (max-width:640px){ .termin{ grid-template-columns:1fr; gap:.4rem; } }
 
   /* ============ GALERIE ============ */
-  .gallery{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:var(--gap); }
-  .gallery-item{
-    position:relative; overflow:hidden; border-radius:4px; aspect-ratio:4/5;
-    box-shadow:var(--shadow);
+  .gallery{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:.6rem;
   }
+  @media (min-width:520px){ .gallery{ grid-template-columns:repeat(3,1fr); gap:.9rem; } }
+  @media (min-width:900px){ .gallery{ grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:var(--gap); } }
+  .gallery-item{
+    position:relative; overflow:hidden; border-radius:4px; aspect-ratio:1/1;
+    box-shadow:var(--shadow); cursor:pointer;
+  }
+  @media (min-width:900px){ .gallery-item{ aspect-ratio:4/5; } }
+  .gallery-load-more{ display:flex; justify-content:center; margin-top:clamp(1.5rem,4vw,2.5rem); }
   .gallery-item img{ width:100%; height:100%; object-fit:cover; transition:transform .5s ease; }
   .gallery-item:hover img{ transform:scale(1.06); }
   .gallery-item .cap{
@@ -417,6 +423,7 @@
       <h2 style="font-size:clamp(1.8rem,4vw,2.6rem)">Von der Bühne</h2>
     </div>
     <div class="gallery reveal" id="gallery-grid"></div>
+    <div class="gallery-load-more" id="gallery-load-more"></div>
     <p class="form-note" style="margin-top:1rem;">Neue Fotos? Einfach in den Ordner <code>/gallery</code> legen und lokal <code>build-manifests.py</code> ausführen — sie erscheinen dann automatisch hier.</p>
   </div>
 </section>
@@ -591,17 +598,53 @@
   }
 
   // ============ GALERIE: Bilder aus /gallery/images.json laden ============
+  var GALLERY_BATCH = 6;
   fetch('gallery/images.json')
     .then(function(r){ return r.json(); })
     .then(function(files){
       var grid = document.getElementById('gallery-grid');
+      var loadMoreWrap = document.getElementById('gallery-load-more');
       if (!grid) return;
-      files.forEach(function(file){
-        var item = document.createElement('div');
-        item.className = 'gallery-item';
-        item.innerHTML = '<img src="gallery/' + file + '" alt="" loading="lazy">';
-        grid.appendChild(item);
-      });
+      var shown = 0;
+
+      function openLightbox(file){
+        var modal = document.getElementById('poster-modal');
+        var modalImg = document.getElementById('poster-modal-img');
+        modalImg.src = 'gallery/' + file;
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+
+      function renderBatch(){
+        var next = files.slice(shown, shown + GALLERY_BATCH);
+        next.forEach(function(file){
+          var item = document.createElement('div');
+          item.className = 'gallery-item';
+          var img = document.createElement('img');
+          img.src = 'gallery/' + file;
+          img.alt = '';
+          img.loading = 'lazy';
+          item.appendChild(img);
+          item.addEventListener('click', function(){ openLightbox(file); });
+          grid.appendChild(item);
+        });
+        shown += next.length;
+        updateLoadMoreButton();
+      }
+
+      function updateLoadMoreButton(){
+        loadMoreWrap.innerHTML = '';
+        if (shown < files.length) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'btn btn-ghost';
+          btn.textContent = 'Mehr laden (' + (files.length - shown) + ')';
+          btn.addEventListener('click', renderBatch);
+          loadMoreWrap.appendChild(btn);
+        }
+      }
+
+      renderBatch();
     })
     .catch(function(){
       var grid = document.getElementById('gallery-grid');
