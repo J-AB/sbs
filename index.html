@@ -334,6 +334,21 @@
     line-height:1;
   }
   .poster-modal-close:hover{ color:var(--brass-lt); }
+  .poster-modal-nav{
+    position:absolute; top:50%; translate:0 -50%; z-index:2;
+    width:48px; height:48px; border-radius:50%; border:1px solid rgba(255,255,255,.25);
+    background:rgba(10,11,20,.55); backdrop-filter:blur(6px);
+    color:var(--ink); font-size:1.8rem; line-height:1; cursor:pointer;
+    display:none; align-items:center; justify-content:center;
+    transition:background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .poster-modal-nav:hover{ background:rgba(227,168,92,.25); border-color:var(--brass); color:var(--brass-lt); }
+  .poster-modal.has-nav .poster-modal-nav{ display:flex; }
+  .poster-modal-prev{ left:clamp(.5rem,3vw,2rem); }
+  .poster-modal-next{ right:clamp(.5rem,3vw,2rem); }
+  @media (max-width:640px){
+    .poster-modal-nav{ width:40px; height:40px; font-size:1.4rem; }
+  }
 
 
   @media (prefers-reduced-motion: reduce){
@@ -507,10 +522,12 @@
 
 <div class="poster-modal" id="poster-modal" aria-hidden="true">
   <div class="poster-modal-backdrop" id="poster-modal-backdrop"></div>
+  <button type="button" class="poster-modal-nav poster-modal-prev" id="poster-modal-prev" aria-label="Vorheriges Bild">‹</button>
   <div class="poster-modal-content">
     <button type="button" class="poster-modal-close" id="poster-modal-close" aria-label="Schließen">✕</button>
     <img id="poster-modal-img" src="" alt="Event-Plakat">
   </div>
+  <button type="button" class="poster-modal-nav poster-modal-next" id="poster-modal-next" aria-label="Nächstes Bild">›</button>
 </div>
 
 <footer>
@@ -607,17 +624,19 @@
       if (!grid) return;
       var shown = 0;
 
-      function openLightbox(file){
+      function openLightbox(index){
         var modal = document.getElementById('poster-modal');
         var modalImg = document.getElementById('poster-modal-img');
-        modalImg.src = 'gallery/' + file;
-        modal.classList.add('open');
+        modalImg.src = 'gallery/' + files[index];
+        modal.dataset.index = index;
+        modal.classList.add('open', 'has-nav');
         modal.setAttribute('aria-hidden', 'false');
       }
 
       function renderBatch(){
         var next = files.slice(shown, shown + GALLERY_BATCH);
-        next.forEach(function(file){
+        next.forEach(function(file, i){
+          var index = shown + i;
           var item = document.createElement('div');
           item.className = 'gallery-item';
           var img = document.createElement('img');
@@ -625,7 +644,7 @@
           img.alt = '';
           img.loading = 'lazy';
           item.appendChild(img);
-          item.addEventListener('click', function(){ openLightbox(file); });
+          item.addEventListener('click', function(){ openLightbox(index); });
           grid.appendChild(item);
         });
         shown += next.length;
@@ -645,6 +664,31 @@
       }
 
       renderBatch();
+
+      // Pfeilnavigation im Overlay (nur relevant, wenn von der Galerie geöffnet)
+      function showGalleryIndex(index){
+        var modal = document.getElementById('poster-modal');
+        var modalImg = document.getElementById('poster-modal-img');
+        var wrapped = (index + files.length) % files.length;
+        modal.dataset.index = wrapped;
+        modalImg.src = 'gallery/' + files[wrapped];
+      }
+      document.getElementById('poster-modal-prev').addEventListener('click', function(){
+        var modal = document.getElementById('poster-modal');
+        if (!modal.classList.contains('has-nav')) return;
+        showGalleryIndex(parseInt(modal.dataset.index, 10) - 1);
+      });
+      document.getElementById('poster-modal-next').addEventListener('click', function(){
+        var modal = document.getElementById('poster-modal');
+        if (!modal.classList.contains('has-nav')) return;
+        showGalleryIndex(parseInt(modal.dataset.index, 10) + 1);
+      });
+      document.addEventListener('keydown', function(e){
+        var modal = document.getElementById('poster-modal');
+        if (!modal.classList.contains('open') || !modal.classList.contains('has-nav')) return;
+        if (e.key === 'ArrowLeft') showGalleryIndex(parseInt(modal.dataset.index, 10) - 1);
+        if (e.key === 'ArrowRight') showGalleryIndex(parseInt(modal.dataset.index, 10) + 1);
+      });
     })
     .catch(function(){
       var grid = document.getElementById('gallery-grid');
@@ -709,6 +753,7 @@
       document.querySelectorAll('.poster-btn').forEach(function(btn){
         btn.addEventListener('click', function(){
           modalImg.src = btn.getAttribute('data-plakat');
+          modal.classList.remove('has-nav');
           modal.classList.add('open');
           modal.setAttribute('aria-hidden', 'false');
         });
@@ -721,7 +766,7 @@
 
   function closePosterModal(){
     var modal = document.getElementById('poster-modal');
-    modal.classList.remove('open');
+    modal.classList.remove('open', 'has-nav');
     modal.setAttribute('aria-hidden', 'true');
   }
   document.getElementById('poster-modal-close').addEventListener('click', closePosterModal);
