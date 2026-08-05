@@ -1,0 +1,4 @@
+Datum: 2026-11-21
+Titel: [Veranstaltung einfügen]
+Ort: [Ort einfügen]
+Uhrzeit: [Uhrzeit einfügen]

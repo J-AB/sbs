@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brassband — Musik für euer Fest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;900&family=Work+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ============ DESIGN TOKENS ============
+     Farbwelt direkt aus euren Bühnenfotos: tiefes Indigo/Blau, Magenta-Scheinwerfer,
+     warmes Messing-Gold der Hörner. Hier zentral anpassen. */
+  :root{
+    --bg:        #0A0B14;   /* fast Schwarz, leicht blau — Bühnendunkel */
+    --bg-alt:    #12131F;
+    --panel:     rgba(255,255,255,.06);
+    --panel-solid: #171826;
+    --ink:       #F4F2EC;   /* helles Off-White für Text auf dunklem Grund */
+    --ink-soft:  #B7B6C4;
+    --brass:     #E3A85C;   /* Messing-Gold — Hauptakzent, aus den Hörnern */
+    --brass-lt:  #F2C989;
+    --magenta:   #E23FA0;   /* Bühnenlicht Pink/Magenta */
+    --blue:      #4C6FFF;   /* Bühnenlicht Blau */
+    --line:      rgba(255,255,255,.14);
+    --shadow:    0 20px 50px rgba(0,0,0,.5);
+
+    --font-display: 'Big Shoulders Display', sans-serif;
+    --font-body:    'Work Sans', sans-serif;
+
+    --maxw: 1180px;
+    --gap:  clamp(1.25rem, 3vw, 2.5rem);
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{ max-width:100%; display:block; }
+  a{ color:inherit; }
+  .wrap{
+    max-width:var(--maxw);
+    margin-inline:auto;
+    padding-inline:clamp(1.25rem, 5vw, 3rem);
+    position:relative; z-index:1;
+  }
+  h1,h2,h3{
+    font-family:var(--font-display);
+    text-transform:uppercase;
+    letter-spacing:.01em;
+    margin:0 0 .5em;
+    line-height:.95;
+  }
+  .eyebrow{
+    font-family:var(--font-body);
+    text-transform:uppercase;
+    letter-spacing:.18em;
+    font-size:.72rem;
+    font-weight:600;
+    color:var(--brass-lt);
+    display:inline-block;
+    margin-bottom:.9em;
+  }
+  .lead{
+    font-size:clamp(1.05rem,1.6vw,1.25rem);
+    color:var(--ink-soft);
+    max-width:52ch;
+    text-shadow:0 2px 12px rgba(0,0,0,.5);
+  }
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:.5em;
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:.95rem;
+    padding:.85em 1.6em;
+    border-radius:2px;
+    text-decoration:none;
+    border:1.5px solid transparent;
+    cursor:pointer;
+    transition:transform .15s ease, background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .btn:hover{ transform:translateY(-2px); }
+  .btn-primary{ background:var(--brass); color:#1A1200; }
+  .btn-primary:hover{ background:var(--brass-lt); }
+  .btn-ghost{ border-color:rgba(244,242,236,.55); color:var(--ink); }
+  .btn-ghost:hover{ border-color:var(--brass); color:var(--brass-lt); }
+
+  /* ============ NAV ============ */
+  header.nav{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(10,11,20,.78);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    max-width:var(--maxw); margin-inline:auto;
+    padding:1.1rem clamp(1.25rem,5vw,3rem);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand{
+    display:flex; align-items:center; gap:.7rem;
+    font-family:var(--font-display);
+    text-transform:uppercase;
+    font-weight:700;
+    font-size:1.35rem;
+    letter-spacing:.02em;
+  }
+  .brand span{ color:var(--brass); }
+  .logo-placeholder{
+    width:42px; height:42px; border-radius:50%; flex:none;
+    border:1.5px dashed var(--brass);
+    background:rgba(227,168,92,.1);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-body); font-size:.6rem; font-weight:600;
+    letter-spacing:.04em; color:var(--brass-lt); text-transform:uppercase;
+    overflow:hidden;
+  }
+  /* Logo ersetzen: <div class="logo-placeholder"> gegen <img src="img/logo.png" class="logo-placeholder"> tauschen */
+  nav.links{ display:flex; gap:2rem; list-style:none; margin:0; padding:0; }
+  nav.links a{
+    text-decoration:none; font-weight:500; font-size:.92rem;
+    padding-bottom:4px; border-bottom:2px solid transparent;
+    transition:border-color .2s ease, color .2s ease;
+  }
+  nav.links a:hover{ border-color:var(--brass); color:var(--brass-lt); }
+  #menu-toggle{ display:none; }
+  .burger{
+    display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; padding:6px;
+  }
+  .burger span{ width:24px; height:2px; background:var(--ink); display:block; }
+
+  @media (max-width:820px){
+    nav.links{
+      position:fixed; inset:64px 0 0 0; background:rgba(10,11,20,.97);
+      backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+      flex-direction:column; padding:2rem clamp(1.25rem,5vw,3rem);
+      gap:1.5rem; transform:translateX(100%);
+      transition:transform .3s ease; border-top:1px solid var(--line);
+    }
+    nav.links a{ font-size:1.1rem; }
+    #menu-toggle:checked ~ nav.links{ transform:translateX(0); }
+    .burger{ display:flex; }
+  }
+
+  /* ============ PHOTO SECTIONS ============
+     Jede Sektion mit echtem Bühnenfoto als Hintergrund. Wird beim Herunterscrollen
+     zunehmend unscharf (siehe Script unten) — bleibt beim Betreten der Sektion scharf. */
+  .photo-section{ position:relative; overflow:hidden; }
+  .bg{ position:absolute; inset:0; z-index:0; }
+  .bg-img{
+    width:100%; height:100%; object-fit:cover;
+    transform:scale(1.12);
+    filter:blur(0px);
+    will-change:filter;
+  }
+  .bg-overlay{
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(10,11,20,.35) 0%, rgba(10,11,20,.72) 60%, rgba(10,11,20,.94) 100%);
+  }
+  .bg-overlay.strong{
+    background:linear-gradient(180deg, rgba(10,11,20,.65) 0%, rgba(10,11,20,.85) 50%, rgba(10,11,20,.96) 100%);
+  }
+
+  .hero{ min-height:100svh; display:flex; flex-direction:column; justify-content:center; padding-top:6rem; }
+  .hero-bg{
+    position:fixed; inset:0; z-index:-1; overflow:hidden;
+    will-change:filter;
+  }
+  .hero-slideshow{ position:absolute; inset:0; }
+  .hero-slideshow .slide{
+    position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; opacity:0; transform:scale(1.08);
+    transition:opacity 1.8s ease;
+  }
+  .hero-slideshow .slide.active{ opacity:1; }
+  .hero-content{ max-width:760px; }
+  .hero h1{
+    font-size:clamp(3rem, 9vw, 7.2rem);
+    font-weight:900;
+    color:var(--ink);
+    text-shadow:0 4px 30px rgba(0,0,0,.6);
+  }
+  .hero h1 em{ font-style:normal; color:var(--brass); }
+  .hero .cta-row{ display:flex; gap:1rem; flex-wrap:wrap; margin-top:2rem; }
+
+  section{ padding-block:clamp(3.5rem, 9vw, 7rem); }
+  .section-head{ max-width:640px; margin-bottom:clamp(2rem,5vw,3.5rem); }
+
+  /* ============ GLASS PANELS ============ */
+  .glass{
+    background:rgba(23,24,38,.72);
+    backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:4px;
+    box-shadow:var(--shadow);
+  }
+
+  /* ============ ABOUT / MEMBERS ============ */
+  .about-grid{ display:grid; grid-template-columns:1fr; gap:var(--gap); }
+  @media (min-width:900px){ .about-grid{ grid-template-columns:.85fr 1.15fr; align-items:start; } }
+  .members{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+    gap:1px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.1); border-radius:4px; overflow:hidden;
+  }
+  .member-card{ background:rgba(23,24,38,.78); backdrop-filter:blur(10px); padding:1.4rem 1.1rem; transition:background .2s ease; }
+  .member-card:hover{ box-shadow:inset 0 -3px 0 var(--brass); }
+  .member-card .instr{
+    font-family:var(--font-display); text-transform:uppercase; font-weight:700;
+    font-size:1.15rem; color:var(--brass-lt); margin-bottom:.3rem;
+  }
+  .member-card .name{ font-size:.88rem; color:var(--ink-soft); }
+
+  /* ============ TERMINE ============ */
+  .termine-list{ display:flex; flex-direction:column; }
+  .termin{
+    display:grid; grid-template-columns:auto 1fr auto; gap:1.5rem; align-items:center;
+    padding:1.2rem 1.4rem; margin-bottom:.6rem;
+  }
+  .termin .date{
+    font-family:var(--font-display); font-weight:700; color:var(--brass);
+    font-size:1.4rem; min-width:5.5rem; text-transform:uppercase;
+  }
+  .termin .date small{ display:block; font-family:var(--font-body); font-weight:500; color:var(--ink-soft); font-size:.7rem; letter-spacing:.1em; }
+  .termin .details b{ display:block; font-size:1.05rem; }
+  .termin .details span{ color:var(--ink-soft); font-size:.9rem; }
+  @media (max-width:640px){ .termin{ grid-template-columns:1fr; gap:.4rem; } }
+
+  /* ============ GALERIE ============ */
+  .gallery{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:var(--gap); }
+  .gallery-item{
+    position:relative; overflow:hidden; border-radius:4px; aspect-ratio:4/5;
+    box-shadow:var(--shadow);
+  }
+  .gallery-item img{ width:100%; height:100%; object-fit:cover; transition:transform .5s ease; }
+  .gallery-item:hover img{ transform:scale(1.06); }
+  .gallery-item .cap{
+    position:absolute; left:0; right:0; bottom:0; padding:1rem;
+    background:linear-gradient(0deg, rgba(10,11,20,.85), transparent);
+    font-size:.78rem; letter-spacing:.04em; color:var(--ink-soft);
+    opacity:0; transition:opacity .25s ease;
+  }
+  .gallery-item:hover .cap{ opacity:1; }
+
+  /* ============ KONTAKT ============ */
+  .kontakt-grid{ display:grid; grid-template-columns:1fr; gap:var(--gap); }
+  @media (min-width:900px){ .kontakt-grid{ grid-template-columns:.8fr 1.2fr; } }
+  .info-block{ border-top:1px solid rgba(255,255,255,.16); padding-top:1.5rem; margin-top:2rem; }
+  .info-block a{ text-decoration:none; color:var(--brass-lt); }
+  form{ padding:clamp(1.5rem,4vw,2.5rem); }
+  .form-row{ display:grid; grid-template-columns:1fr; gap:1.1rem; margin-bottom:1.1rem; }
+  @media (min-width:560px){ .form-row.two{ grid-template-columns:1fr 1fr; } }
+  label{ display:block; font-size:.82rem; font-weight:600; margin-bottom:.4rem; color:var(--ink); }
+  input, select, textarea{
+    width:100%; font-family:var(--font-body); font-size:.95rem;
+    padding:.7em .8em; border:1.5px solid rgba(255,255,255,.18); border-radius:2px;
+    background:rgba(10,11,20,.5); color:var(--ink);
+  }
+  input::placeholder, textarea::placeholder{ color:rgba(244,242,236,.4); }
+  input:focus, select:focus, textarea:focus{
+    outline:none; border-color:var(--brass); box-shadow:0 0 0 3px rgba(227,168,92,.22);
+  }
+  select option{ background:var(--panel-solid); color:var(--ink); }
+  fieldset{ border:1.5px solid rgba(255,255,255,.18); border-radius:2px; padding:.8em .9em; margin:0; }
+  fieldset legend{ font-size:.82rem; font-weight:600; padding:0 .3em; }
+  .radio-row{ display:flex; gap:1.3rem; margin-top:.3rem; flex-wrap:wrap; }
+  .radio-row label{ display:flex; align-items:center; gap:.4em; font-weight:400; margin:0; }
+  .radio-row input{ width:auto; }
+  textarea{ resize:vertical; min-height:110px; }
+  form .btn-primary{ width:100%; justify-content:center; margin-top:.4rem; border:none; }
+  .form-note{ font-size:.78rem; color:var(--ink-soft); margin-top:.8rem; }
+  .google-notice{
+    font-size:.82rem; color:var(--ink-soft); line-height:1.5;
+    background:rgba(227,168,92,.08); border:1px solid rgba(227,168,92,.3);
+    border-radius:2px; padding:.9rem 1rem; margin:0 0 1.3rem;
+  }
+  .google-notice strong{ color:var(--brass-lt); }
+  .google-notice a{ text-decoration:underline; }
+  .consent-row{ margin-bottom:1.3rem; }
+  .consent-label{
+    display:flex; align-items:flex-start; gap:.6em;
+    font-size:.85rem; font-weight:400; color:var(--ink-soft); cursor:pointer;
+  }
+  .consent-label input{ width:auto; margin-top:.2em; accent-color:var(--brass); }
+  .form-embed{ padding:clamp(1.5rem,4vw,2.5rem); }
+  .form-placeholder .btn{ margin-top:1rem; width:100%; justify-content:center; }
+  .form-embed iframe{ width:100%; min-height:920px; border:0; border-radius:2px; background:#fff; }
+  @media (max-width:640px){ .form-embed iframe{ min-height:1100px; } }
+
+  /* ============ FOOTER ============ */
+  footer{ padding:2.5rem clamp(1.25rem,5vw,3rem); text-align:center; background:var(--bg-alt); }
+  footer .foot-links{ display:flex; gap:1.5rem; justify-content:center; margin-bottom:1rem; flex-wrap:wrap; }
+  footer .foot-links a{ text-decoration:none; font-size:.85rem; color:var(--ink-soft); }
+  footer .foot-links a:hover{ color:var(--brass-lt); }
+  footer small{ color:var(--ink-soft); font-size:.75rem; }
+
+  .reveal{ opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease; }
+  .reveal.in{ opacity:1; transform:none; }
+
+  /* ============ EVENT-PLAKAT MODAL ============ */
+  .poster-modal{
+    position:fixed; inset:0; z-index:200; display:none;
+    align-items:center; justify-content:center; padding:clamp(1rem,5vw,3rem);
+  }
+  .poster-modal.open{ display:flex; }
+  .poster-modal-backdrop{
+    position:absolute; inset:0; background:rgba(6,7,12,.88);
+    backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  }
+  .poster-modal-content{
+    position:relative; z-index:1; max-width:min(90vw,700px); max-height:88vh;
+  }
+  .poster-modal-content img{
+    max-width:100%; max-height:88vh; border-radius:4px; box-shadow:var(--shadow);
+    display:block; margin-inline:auto;
+  }
+  .poster-modal-close{
+    position:absolute; top:-2.6rem; right:0; background:none; border:none;
+    color:var(--ink); font-size:1.4rem; cursor:pointer; padding:.4rem;
+    line-height:1;
+  }
+  .poster-modal-close:hover{ color:var(--brass-lt); }
+
+
+  @media (prefers-reduced-motion: reduce){
+    .hero-bg{ filter:none !important; }
+    .hero-slideshow .slide{ transition:none; }
+    .reveal{ opacity:1; transform:none; transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand">
+      <div class="logo-placeholder">LOGO</div>
+      <span>[</span>Bandname<span>]</span>
+    </div>
+    <input type="checkbox" id="menu-toggle">
+    <label class="burger" for="menu-toggle" aria-label="Menü öffnen">
+      <span></span><span></span><span></span>
+    </label>
+    <nav class="links">
+      <a href="#about">Über uns</a>
+      <a href="#termine">Termine</a>
+      <a href="#galerie">Galerie</a>
+      <a href="#kontakt">Booking</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-bg" id="hero-bg">
+    <div class="hero-slideshow" id="hero-slideshow" aria-hidden="true"></div>
+    <div class="bg-overlay"></div>
+  </div>
+  <div class="wrap hero-content">
+    <span class="eyebrow">Brassband · 7 Leute</span>
+    <h1>Musik für<br><em>euer Fest.</em></h1>
+    <p class="lead">Wir sind eine Brassband und spielen auf Dorffesten, Vereinsfeiern und privaten Anlässen — mit Trompeten, Horn, Posaune, Tuba und Schlagzeug.</p>
+    <div class="cta-row">
+      <a href="#kontakt" class="btn btn-primary">Für euer Fest buchen</a>
+      <a href="#termine" class="btn btn-ghost">Nächste Termine</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ÜBER UNS ============ -->
+<section id="about">
+  <div class="wrap about-grid">
+    <div class="reveal">
+      <span class="eyebrow">Über uns</span>
+      <h2 style="font-size:clamp(1.8rem,4vw,2.6rem)">Das sind wir</h2>
+      <p class="lead">[Hier kurzer Absatz über eure Band einfügen: seit wann es euch gibt, woher ihr kommt, was für Musik ihr spielt.]</p>
+    </div>
+    <div class="members reveal">
+      <div class="member-card"><div class="instr">Trompete</div><div class="name">[Name einfügen]</div></div>
+      <div class="member-card"><div class="instr">Trompete</div><div class="name">[Name einfügen]</div></div>
+      <div class="member-card"><div class="instr">Flügelhorn</div><div class="name">[Name einfügen]</div></div>
+      <div class="member-card"><div class="instr">Horn</div><div class="name">[Name einfügen]</div></div>
+      <div class="member-card"><div class="instr">Posaune</div><div class="name">[Name einfügen]</div></div>
+      <div class="member-card"><div class="instr">Tuba</div><div class="name">[Name einfügen]</div></div>
+      <div class="member-card"><div class="instr">Schlagzeug</div><div class="name">Jan</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TERMINE ============ -->
+<section id="termine">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Termine</span>
+      <h2 style="font-size:clamp(1.8rem,4vw,2.6rem)">Wo ihr uns hört</h2>
+    </div>
+    <div class="termine-list reveal glass" id="termine-list">
+      <p class="form-note" style="margin:0;">Termine werden geladen …</p>
+    </div>
+    <p class="form-note" style="margin-top:1rem;">Neuer Termin? Im Ordner <code>/events</code> eine <code>YYYYMMDD_Name.txt</code>-Datei anlegen (z. B. <code>20260912_Sommerfest.txt</code>) und optional ein Plakat mit exakt demselben Namen dazulegen (<code>20260912_Sommerfest.jpg</code>) — dann lokal <code>build-manifests.py</code> ausführen.</p>
+  </div>
+</section>
+
+<!-- ============ GALERIE ============ -->
+<section id="galerie">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Galerie</span>
+      <h2 style="font-size:clamp(1.8rem,4vw,2.6rem)">Von der Bühne</h2>
+    </div>
+    <div class="gallery reveal" id="gallery-grid"></div>
+    <p class="form-note" style="margin-top:1rem;">Neue Fotos? Einfach in den Ordner <code>/gallery</code> legen und lokal <code>build-manifests.py</code> ausführen — sie erscheinen dann automatisch hier.</p>
+  </div>
+</section>
+
+<!-- ============ KONTAKT / BOOKING ============ -->
+<section id="kontakt">
+  <div class="wrap kontakt-grid">
+    <div class="reveal">
+      <span class="eyebrow">Booking</span>
+      <h2 style="font-size:clamp(1.8rem,4vw,2.6rem)">Fest geplant?<br>Wir kommen.</h2>
+      <p class="lead">Schickt uns eure Anfrage mit den wichtigsten Eckdaten — wir melden uns bei euch.</p>
+      <div class="info-block">
+        <p><strong>E-Mail</strong><br><a href="mailto:booking@eureband.de">booking@eureband.de</a></p>
+        <p><strong>Musikverein</strong><br>[Name des Vereins einfügen]</p>
+      </div>
+    </div>
+
+    <form id="booking-form" class="glass reveal" action="https://docs.google.com/forms/d/e/1FAIpQLSdM07Cr3z_EjFCaOW99xJB_MNSr_5mODS-O8AalXsW7ndrZmw/formResponse" method="POST">
+      <p class="google-notice">
+        Dieses Formular ist im Website-Design gestaltet, sendet eure Angaben beim Absenden aber technisch an
+        <strong>Google Forms</strong> (Google Ireland Limited), wo sie in unserer Tabelle gespeichert werden.
+        Dabei können auch Daten wie eure IP-Adresse an Google übertragen werden. Details in der
+        <a href="datenschutz.html">Datenschutzerklärung</a>.
+      </p>
+      <div class="form-row two">
+        <div>
+          <label for="name">Name</label>
+          <input type="text" id="name" name="entry.447828928" required>
+        </div>
+        <div>
+          <label for="email">E-Mail</label>
+          <input type="email" id="email" name="entry.685627187" required>
+        </div>
+      </div>
+      <div class="form-row two">
+        <div>
+          <label for="art">Art der Veranstaltung</label>
+          <input type="text" id="art" name="entry.1004586662" placeholder="z. B. Vereinsfest, Hochzeit, Firmenfeier">
+        </div>
+        <div>
+          <label for="datum">Datum</label>
+          <input type="date" id="datum" name="entry.67969520">
+        </div>
+      </div>
+      <div class="form-row two">
+        <div>
+          <label for="ort">Ort / Veranstaltungsort</label>
+          <input type="text" id="ort" name="entry.1155045227">
+        </div>
+        <div>
+          <label for="dauer">Gewünschte Spieldauer</label>
+          <input type="text" id="dauer" name="entry.1446538463" placeholder="z. B. 2 Stunden">
+        </div>
+      </div>
+      <div class="form-row">
+        <fieldset>
+          <legend>PA-Anlage vor Ort vorhanden?</legend>
+          <div class="radio-row">
+            <label><input type="radio" name="entry.389597244" value="Vorhanden" required> Vorhanden</label>
+            <label><input type="radio" name="entry.389597244" value="nicht Vorhanden"> Nicht vorhanden</label>
+          </div>
+        </fieldset>
+      </div>
+      <div class="form-row">
+        <div>
+          <label for="nachricht">Nachricht</label>
+          <textarea id="nachricht" name="entry.1647454500" placeholder="Weitere Details zu eurer Veranstaltung..."></textarea>
+        </div>
+      </div>
+      <div class="form-row consent-row">
+        <label class="consent-label">
+          <input type="checkbox" id="consent" required>
+          Ich bin einverstanden, dass meine Angaben zur Bearbeitung dieser Anfrage an Google Forms übermittelt und dort gespeichert werden.
+        </label>
+      </div>
+      <button type="submit" class="btn btn-primary">Anfrage senden</button>
+      <p class="form-note" id="form-status">Eure Angaben werden direkt in unserer Google-Tabelle gespeichert.</p>
+    </form>
+  </div>
+</section>
+
+<div class="poster-modal" id="poster-modal" aria-hidden="true">
+  <div class="poster-modal-backdrop" id="poster-modal-backdrop"></div>
+  <div class="poster-modal-content">
+    <button type="button" class="poster-modal-close" id="poster-modal-close" aria-label="Schließen">✕</button>
+    <img id="poster-modal-img" src="" alt="Event-Plakat">
+  </div>
+</div>
+
+<footer>
+  <div class="foot-links">
+    <a href="#about">Über uns</a>
+    <a href="#termine">Termine</a>
+    <a href="#galerie">Galerie</a>
+    <a href="#kontakt">Booking</a>
+    <a href="impressum.html">Impressum</a>
+    <a href="datenschutz.html">Datenschutz</a>
+  </div>
+  <small>© <span id="year"></span> [Bandname] — Musikverein [Vereinsname]</small>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  document.querySelectorAll('nav.links a').forEach(function(link){
+    link.addEventListener('click', function(){
+      document.getElementById('menu-toggle').checked = false;
+    });
+  });
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Scroll-Reveal
+  if (!reduceMotion && 'IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in'); });
+  }
+
+  // ============ HERO-DIASHOW ============
+  // Fokusbereich pro Bild hier anpassen: "x% y%" bestimmt, welcher Bildbereich
+  // im Zuschnitt sichtbar bleibt (z. B. "50% 20%" = horizontal mittig, oben betont).
+  var heroSlides = [
+    { src: 'img/photo-horn-solo.jpg',  focus: '60% 20%' },
+    { src: 'img/photo-drums.jpg',      focus: '30% 40%' },
+    { src: 'img/photo-trombone.jpg',   focus: '55% 35%' },
+    { src: 'img/photo-duo-vocals.jpg', focus: '50% 25%' },
+    { src: 'img/photo-trumpets.jpg',   focus: '50% 35%' }
+  ];
+  var slideshowEl = document.getElementById('hero-slideshow');
+  heroSlides.forEach(function(slide, i){
+    var img = document.createElement('img');
+    img.className = 'slide' + (i === 0 ? ' active' : '');
+    img.src = slide.src;
+    img.alt = '';
+    img.style.objectPosition = slide.focus;
+    slideshowEl.appendChild(img);
+  });
+  var slideEls = slideshowEl.querySelectorAll('.slide');
+  var current = 0;
+  if (!reduceMotion && slideEls.length > 1) {
+    setInterval(function(){
+      slideEls[current].classList.remove('active');
+      current = (current + 1) % slideEls.length;
+      slideEls[current].classList.add('active');
+    }, 8000);
+  }
+
+  // Hero-Hintergrund bleibt fix stehen (kein Wegscrollen) und wird beim
+  // Herunterscrollen zunehmend unscharf; oben auf der Seite bleibt er scharf.
+  var heroBg = document.getElementById('hero-bg');
+  var ticking = false;
+  function updateBlur(){
+    var scrolled = window.scrollY || window.pageYOffset;
+    var blur = Math.min(scrolled / 16, 18);
+    heroBg.style.filter = 'blur(' + blur.toFixed(1) + 'px)';
+    ticking = false;
+  }
+  if (!reduceMotion) {
+    window.addEventListener('scroll', function(){
+      if (!ticking) { requestAnimationFrame(updateBlur); ticking = true; }
+    }, { passive:true });
+    updateBlur();
+  }
+
+  // ============ GALERIE: Bilder aus /gallery/images.json laden ============
+  fetch('gallery/images.json')
+    .then(function(r){ return r.json(); })
+    .then(function(files){
+      var grid = document.getElementById('gallery-grid');
+      if (!grid) return;
+      files.forEach(function(file){
+        var item = document.createElement('div');
+        item.className = 'gallery-item';
+        item.innerHTML = '<img src="gallery/' + file + '" alt="" loading="lazy">';
+        grid.appendChild(item);
+      });
+    })
+    .catch(function(){
+      var grid = document.getElementById('gallery-grid');
+      if (grid) grid.innerHTML = '<p class="form-note">Galerie konnte nicht geladen werden — ist gallery/images.json vorhanden?</p>';
+    });
+
+  // ============ TERMINE: Events aus /events/*.txt laden ============
+  function parseEventTxt(text){
+    var data = {};
+    text.split('\n').forEach(function(line){
+      var idx = line.indexOf(':');
+      if (idx === -1) return;
+      var key = line.slice(0, idx).trim().toLowerCase();
+      var value = line.slice(idx + 1).trim();
+      data[key] = value;
+    });
+    return data;
+  }
+  function formatDatum(iso){
+    if (!iso) return { tag:'TT.MM', jahr:'----' };
+    var parts = iso.split('-');
+    if (parts.length !== 3) return { tag: iso, jahr:'' };
+    return { tag: parts[2] + '.' + parts[1], jahr: parts[0] };
+  }
+  fetch('events/events.json')
+    .then(function(r){ return r.json(); })
+    .then(function(entries){
+      return Promise.all(entries.map(function(entry){
+        return fetch('events/' + entry.txt).then(function(r){ return r.text(); }).then(function(text){
+          var data = parseEventTxt(text);
+          data.plakat = entry.plakat || null;
+          return data;
+        });
+      }));
+    })
+    .then(function(events){
+      events.sort(function(a, b){ return (a.datum || '').localeCompare(b.datum || ''); });
+      var list = document.getElementById('termine-list');
+      if (!list) return;
+      if (events.length === 0) {
+        list.innerHTML = '<p class="form-note" style="margin:0;">Aktuell keine Termine eingetragen.</p>';
+        return;
+      }
+      list.innerHTML = '';
+      events.forEach(function(ev){
+        var d = formatDatum(ev.datum);
+        var row = document.createElement('div');
+        row.className = 'termin';
+        var detailsBtn = ev.plakat
+          ? '<button type="button" class="btn btn-ghost poster-btn" data-plakat="events/' + ev.plakat + '" style="padding:.5em 1.1em;font-size:.8rem;">Details</button>'
+          : '<span class="form-note" style="margin:0;">Kein Plakat</span>';
+        row.innerHTML =
+          '<div class="date">' + d.tag + '<small>' + d.jahr + '</small></div>' +
+          '<div class="details"><b>' + (ev.titel || 'Veranstaltung') + '</b><span>' + (ev.ort || '') + (ev.uhrzeit ? ' · ' + ev.uhrzeit : '') + '</span></div>' +
+          detailsBtn;
+        list.appendChild(row);
+      });
+
+      // Plakat-Modal öffnen
+      var modal = document.getElementById('poster-modal');
+      var modalImg = document.getElementById('poster-modal-img');
+      document.querySelectorAll('.poster-btn').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          modalImg.src = btn.getAttribute('data-plakat');
+          modal.classList.add('open');
+          modal.setAttribute('aria-hidden', 'false');
+        });
+      });
+    })
+    .catch(function(){
+      var list = document.getElementById('termine-list');
+      if (list) list.innerHTML = '<p class="form-note" style="margin:0;">Termine konnten nicht geladen werden — ist events/events.json vorhanden?</p>';
+    });
+
+  function closePosterModal(){
+    var modal = document.getElementById('poster-modal');
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+  document.getElementById('poster-modal-close').addEventListener('click', closePosterModal);
+  document.getElementById('poster-modal-backdrop').addEventListener('click', closePosterModal);
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closePosterModal(); });
+
+  // Formular sendet die Daten im Hintergrund an Google Forms (landen in eurer
+  // Google-Tabelle), bleibt dabei aber komplett im Website-Design.
+  var bookingForm = document.getElementById('booking-form');
+  if (bookingForm) {
+    bookingForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      var status = document.getElementById('form-status');
+      var submitBtn = bookingForm.querySelector('button[type="submit"]');
+      var data = new FormData(bookingForm);
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Wird gesendet...';
+      fetch(bookingForm.action, { method:'POST', mode:'no-cors', body:data })
+        .then(function(){
+          bookingForm.reset();
+          status.textContent = 'Danke! Eure Anfrage wurde übermittelt — wir melden uns.';
+          submitBtn.textContent = 'Anfrage senden';
+          submitBtn.disabled = false;
+        })
+        .catch(function(){
+          status.textContent = 'Da ist leider etwas schiefgelaufen. Versucht es bitte erneut.';
+          submitBtn.textContent = 'Anfrage senden';
+          submitBtn.disabled = false;
+        });
+    });
+  }
+</script>
+
+</body>
+</html>
