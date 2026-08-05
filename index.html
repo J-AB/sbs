@@ -108,23 +108,14 @@
   }
   .brand{
     display:flex; align-items:center; gap:.7rem;
-    font-family:var(--font-display);
-    text-transform:uppercase;
-    font-weight:700;
-    font-size:1.35rem;
-    letter-spacing:.02em;
+    text-decoration:none; cursor:pointer;
   }
-  .brand span{ color:var(--brass); }
+  .wordmark{ height:22px; width:auto; display:block; }
   .logo-placeholder{
     width:42px; height:42px; border-radius:50%; flex:none;
-    border:1.5px dashed var(--brass);
-    background:rgba(227,168,92,.1);
-    display:flex; align-items:center; justify-content:center;
-    font-family:var(--font-body); font-size:.6rem; font-weight:600;
-    letter-spacing:.04em; color:var(--brass-lt); text-transform:uppercase;
-    overflow:hidden;
+    object-fit:cover; display:block;
   }
-  /* Logo ersetzen: <div class="logo-placeholder"> gegen <img src="img/logo.png" class="logo-placeholder"> tauschen */
+  /* Logo ersetzen: einfach die Datei img/logo-placeholder.png durch euer eigenes rundes Logo ersetzen */
   nav.links{ display:flex; gap:2rem; list-style:none; margin:0; padding:0; }
   nav.links a{
     text-decoration:none; font-weight:500; font-size:.92rem;
@@ -362,10 +353,10 @@
 
 <header class="nav">
   <div class="nav-inner">
-    <div class="brand">
-      <div class="logo-placeholder">LOGO</div>
-      <span>[</span>Bandname<span>]</span>
-    </div>
+    <a href="#" class="brand" id="brand-home" aria-label="Nach oben scrollen">
+      <img class="logo-placeholder" src="img/logo-placeholder.png" alt="Logo">
+      <img class="wordmark" src="img/wordmark-bandname.png" alt="Bandname">
+    </a>
     <input type="checkbox" id="menu-toggle">
     <label class="burger" for="menu-toggle" aria-label="Menü öffnen">
       <span></span><span></span><span></span>
@@ -544,6 +535,11 @@
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  document.getElementById('brand-home').addEventListener('click', function(e){
+    e.preventDefault();
+    window.scrollTo({ top:0, behavior: reduceMotion ? 'auto' : 'smooth' });
+  });
 
   document.querySelectorAll('nav.links a').forEach(function(link){
     link.addEventListener('click', function(){
