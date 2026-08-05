@@ -91,8 +91,12 @@
   .btn:hover{ transform:translateY(-2px); }
   .btn-primary{ background:var(--brass); color:#1A1200; }
   .btn-primary:hover{ background:var(--brass-lt); }
-  .btn-ghost{ border-color:rgba(244,242,236,.55); color:var(--ink); }
-  .btn-ghost:hover{ border-color:var(--brass); color:var(--brass-lt); }
+  .btn-ghost{
+    border-color:rgba(244,242,236,.3); color:var(--ink);
+    background:rgba(255,255,255,.06); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  }
+  .btn-ghost:hover{ border-color:var(--brass); color:var(--brass-lt); background:rgba(227,168,92,.12); }
+  .btn-sm{ padding:.55em 1.2em; font-size:.82rem; }
 
   /* ============ NAV ============ */
   header.nav{
@@ -734,7 +738,7 @@
         var row = document.createElement('div');
         row.className = 'termin';
         var detailsBtn = ev.plakat
-          ? '<button type="button" class="btn btn-ghost poster-btn" data-plakat="events/' + ev.plakat + '" style="padding:.5em 1.1em;font-size:.8rem;">Details</button>'
+          ? '<button type="button" class="btn btn-ghost btn-sm poster-btn" data-plakat="events/' + ev.plakat + '">Details</button>'
           : '<span class="form-note" style="margin:0;">Kein Plakat</span>';
         row.innerHTML =
           '<div class="date">' + d.tag + '<small>' + d.jahr + '</small></div>' +
